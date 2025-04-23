@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blind Driver 2050</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="intro">
+    <div>
+      <h1>Blind Driver<br>2050</h1>
+      <button onclick="startMission()">Start Game</button>
+    </div>
+  </div>
+  <div class="mission" id="mission">
+    <p id="m1"></p>
+    <p id="m2"></p>
+    <p id="m3"></p>
+    <p id="m4"></p>
+    <p id="m5"></p>
+  </div>
+  <div class="frame">
+    <p class="line" id="text1"></p>
+    <p class="line" id="text2"></p>
+    <ol class="choices" id="choices">
+      <li onclick="nextScene('manual')">Switch to manual control</li>
+      <li onclick="nextScene('ai')">Listen to AI advice</li>
+    </ol>
+  </div>
+  <audio id="rumble-sound" src="https://cdn.pixabay.com/download/audio/2023/03/30/audio_f7742abdf0.mp3?filename=thud-rumble-143987.mp3"></audio>
+  <audio id="response-1" src="https://cdn.pixabay.com/download/audio/2021/09/14/audio_50a92a22f7.mp3?filename=robot-affirmative-voice-1.mp3"></audio>
+  <audio id="response-2" src="https://cdn.pixabay.com/download/audio/2021/09/14/audio_d48eb1a06f.mp3?filename=robot-affirmative-voice-2.mp3"></audio>
+  <audio id="mission-voice" src="https://cdn.pixabay.com/download/audio/2022/03/07/audio_faa42d8cb2.mp3?filename=futuristic-voice-message-2-15169.mp3"></audio>
+  <script>
+    const missionLines = [
+      "Initializing autonomous transport protocol...",
+      "Operator: Jack Smith. Simulation Subject H13.",
+      "Route: From Los Angeles to New York City.",
+      "Cargo: Unknown non-chemical cargo. Handle with protocol silence.",
+      "Manual override granted. AI will defer on judgment failures."
+    ];
+    function typeWriter(text, elementId, delay = 50) {
+      let i = 0;
+      const el = document.getElementById(elementId);
+      el.innerHTML = "";
+      function type() {
+        if (i < text.length) {
+          el.innerHTML += text.charAt(i);
+          i++;
+          setTimeout(type, delay);
+        }
+      }
+      type();
+    }
+    function startMission() {
+      document.querySelector('.intro').style.display = 'none';
+      const mission = document.getElementById('mission');
+      mission.style.display = 'flex';
+      document.getElementById('mission-voice').play();
+      missionLines.forEach((line, index) => {
+        setTimeout(() => {
+          typeWriter(line, `m${index + 1}`, 30);
+          document.getElementById(`m${index + 1}`).style.opacity = 1;
+          document.getElementById(`m${index + 1}`).scrollIntoView({ behavior: 'smooth' });
+        }, 2000 * index);
+      });
+      setTimeout(() => {
+        mission.style.display = 'none';
+        document.querySelector('.frame').style.display = 'flex';
+        typeWriter("The truck is in autonomous mode.\nYou are the operator.", "text1", 30);
+        typeWriter("The vibration of the vehicle has subtly changed.", "text2", 30);
+        setTimeout(randomShake, 3000);
+      }, 12000);
+    }
+    function randomShake() {
+      const frame = document.querySelector('.frame');
+      const isLarge = Math.random() > 0.5;
+      const animClass = isLarge ? 'shake-large' : 'shake-small';
+      frame.style.animation = `${animClass} 0.4s`;
+      document.getElementById('rumble-sound').play();
+      setTimeout(() => {
+        frame.style.animation = '';
+      }, 400);
+      const nextDelay = 3000 + Math.random() * 2000;
+      setTimeout(randomShake, nextDelay);
+    }
+    function nextScene(choice) {
+      const text1 = document.getElementById('text1');
+      const text2 = document.getElementById('text2');
+      const choices = document.getElementById('choices');
+      choices.style.display = 'none';
+      if (choice === 'manual') {
+        typeWriter("Manual control engaged. Cabin rumbles...", "text1", 30);
+        setTimeout(() => {
+          typeWriter("Unexpected terrain pattern. AI override now unavailable.", "text2", 30);
+        }, 2000);
+      } else if (choice === 'ai') {
+        typeWriter("AI: Analyzing... Caution advised. Energy anomaly detected.", "text1", 30);
+        setTimeout(() => {
+          typeWriter("Decision: Continue current course. Adjust speed in next 2 minutes.", "text2", 30);
+        }, 2000);
+      }
+    }
+  </script>
+</body>
+</html>
